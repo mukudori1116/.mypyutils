@@ -3,6 +3,7 @@ import re
 from glob import glob
 import numpy as np
 import pandas as pd
+from myutils import grab
 
 
 def split_decomp(file: str):
@@ -104,6 +105,7 @@ def decomp_summary(decomp):
         line = f.readline()
         tmp_list = []
         data = {}
+        parent, child = None, None
         columns = ['Internal', 'van der Waals', 'Electrostatic',
                    'PolarSolvation', 'Non-PolarSolv', 'TOTAL']
         while line:
@@ -133,3 +135,19 @@ def decomp_summary(decomp):
         data[parent][child]['sem'] = sem
 
     return data
+
+
+def cutoff_mol2_charges(input_file, output_file):
+    header, body, footer = grab(input_file, "@<TRIPOS>ATOM", "@<TRIPOS>BOND")
+    atoms = map(lambda x: x.split(), body.split("\n"))
+    df = pd.DataFrame(atoms).dropna()
+
+    charges_origin = df.iloc[:, -1].values
+    charges_fix = df.iloc[:, -1].astype(np.float128).round(5)
+    delta = charges_fix.sum()
+    charges_fix[charges_fix == charges_fix.max()] -= delta
+    charges_fix_5 = map(lambda x: "{:.5f}".format(x), charges_fix.values)
+    for origin, fix in zip(charges_origin, charges_fix_5):
+        body = body.replace(origin, fix)
+    with open(output_file, "w") as f:
+        f.write(header+body+footer)

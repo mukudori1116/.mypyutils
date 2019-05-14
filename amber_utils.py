@@ -3,7 +3,7 @@ import re
 from glob import glob
 import numpy as np
 import pandas as pd
-from myutils import grab
+from myutils import grab, continuous
 
 
 def split_decomp(file: str):
@@ -151,3 +151,16 @@ def cutoff_mol2_charges(input_file, output_file):
         body = body.replace(origin, fix)
     with open(output_file, "w") as f:
         f.write(header+body+footer)
+
+
+def fluctmask(file, threshold=1.5):
+    af = pd.read_csv(file, delimiter=r"\s+")
+    sec = af["#Res"][af.AtomicFlx <= threshold].astype(int).values
+    fragments = continuous(sec)
+    masks = list()
+    for fragment in fragments:
+        if len(fragment) == 1:
+            masks.append(f"{fragment[0]}")
+        else:
+            masks.append(f"{fragment[0]}-{fragment[-1]}")
+    return ",".join(masks)

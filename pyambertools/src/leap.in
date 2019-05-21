@@ -1,0 +1,26 @@
+source leaprc.protein.ff14SB
+source leaprc.gaff2
+source leaprc.water.tip3p
+
+set default PBRadii mbondi3
+loadamberparams {{frcmod}}
+
+lig = loadmol2 {{mol2}}
+rec = loadpdb {{rec}}
+com = combine {lig rec}
+
+saveamberparm lig {{lig_parm7}} {{lig_rst7}}
+saveamberparm rec {{rec_parm7}} {{rec_rst7}}
+
+addions2 com Na+ 20
+addions2 com Cl- 0
+solvatebox com TIP3PBOX 10.0
+
+saveamberparm com {{parm7}} {{rst7}}
+savepdb com {{pdb}}
+
+com = combine {lig rec}
+setbox "vdw" 10.0
+saveamberparm com {{com_nonsolv_parm7}} {{com_nonsolv_rst7}}
+
+quit

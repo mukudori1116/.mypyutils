@@ -1,0 +1,16 @@
+source leaprc.protein.ff14SB
+source leaprc.gaff2
+source leaprc.water.tip3p
+
+set default PBRadii mbondi3
+loadamberparams {{frcmod}}
+
+lig = loadmol2 {{mol2}}
+rec = loadpdb {{rec}}
+com = combine {lig rec}
+
+setbox com "vdw" 10.0
+
+saveamberparm com {{parm7}} {{rst7}}
+
+quit

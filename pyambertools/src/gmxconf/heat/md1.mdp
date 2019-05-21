@@ -1,0 +1,48 @@
+; e.g.: -DPOSRES -DFLEXIBLE (note these variable names are case sensitive)
+define       = -DPOSRES1000
+; RUN CONTROL PARAMETERS
+integrator   = md
+dt           = 0.002
+nsteps       = 100000
+;
+nstxout      = 500
+nstlog       = 500
+nstenergy    = 500
+;
+nstlist      = 5
+ns_type      = grid
+pbc          = xyz
+rlist        = 0.8
+;
+coulombtype  = PME
+rcoulomb     = 0.8
+;
+vdwtype      = cut-off
+rvdw         = 0.8
+dispcorr     = enerpres
+;
+optimize_fft = yes
+;
+tcoupl       = v-rescale
+tc_grps      = Protein Non-Protein
+tau_t        = 0.1 0.1
+ref_t        = 300.0 300.0
+;
+pcoupl       = no
+pcoupltype   = isotropic
+tau_p        = 1.0
+compressibility = 4.5e-5
+ref_p        = 1.0
+refcoord_scaling = all
+;
+gen_vel      = yes
+gen_seed    = -1
+;
+continuation= no; Restarting after previous RUN
+constraints  = hbonds
+constraint_algorithm = LINCS
+
+annealing    = single single
+annealing_npoints = 2 2
+annealing_time = 0 200 0 200
+annealing_temp = 0 300 0 300

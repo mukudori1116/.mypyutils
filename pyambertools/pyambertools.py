@@ -6,6 +6,8 @@ import shutil
 from typing import Optional, List
 import re
 
+from amber_utils import cutoff_mol2_charges
+
 
 class AmberToolsWrapper:
 
@@ -33,7 +35,7 @@ class AmberToolsWrapper:
         self.traj = self.root / "traj"
         self.traj.mkdir(exist_ok=True)
         self.gromacs = self.root/"gromacs"
-        if not self.gromacs.exests():
+        if not self.gromacs.exists():
             shutil.copytree("./src/gmxconf", str(self.gromacs))
 
     def antechamber(self, ligand_files: Optional[List[Path]]=None) -> List[Path]:
@@ -53,7 +55,8 @@ class AmberToolsWrapper:
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 for line in iter(proc.stdout.readline, b''):
                     print(line.rstrip().decode("utf8"))
-
+                # fix charge
+                cutoff_mol2_charges(output_file, output_file)
                 outputs.append(self.modify/(ligand.stem + ".mol2"))
         return outputs
 

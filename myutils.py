@@ -3,26 +3,27 @@ from typing import Iterable, Tuple
 
 
 def grab(file: str, start: str, end: str):
-    with open(file) as f:
-        lines = f.readlines()
+    header, body, footer = "", "", ""
     ishead = True
     isfoot = False
-    header, footer = "", ""
-    body = []
-    for line in lines:
-        if re.match(end, line):
-            isfoot = True
+    with open(file) as f:
+        line = f.readline()
+        while line:
+            if re.match(start, line):
+                ishead = False
+            if re.match(end, line):
+                isfoot = True
 
-        if ishead:
-            header += line
-        elif isfoot:
-            footer += line
-        else:
-            body.append(line)
+            if ishead:
+                header += line
+            elif isfoot:
+                footer += line
+            else:
+                body += line
 
-        if re.match(start, line):
-            ishead = False
-    return (header, "".join(body), footer)
+            line = f.readline()
+
+    return (header, body, footer)
 
 
 def continuous(sequence: Iterable[int], skip: int=1) -> Tuple[Tuple[int], Tuple[int]]:
